@@ -27,10 +27,32 @@ class VkPlayPlatformBridge extends PlatformBridgeBase {
         }
     }
 
-    #vkPlayPlayer = null
     #loginStatus = null
     #registrationInfo = null
     #gameId = null;
+
+    
+    #setPlayer(profileData) {
+        if (profileData.status === 'error') {
+            this._rejectPromiseDecorator(ACTION_NAME.GET_PROFILE, player.errmsg)
+            return
+        }
+
+        this._resolvePromiseDecorator(ACTION_NAME.GET_PROFILE, {
+            _playerId: player.uid,
+            _playerName: player.nick,
+            _playerPhotos: [player.avatar],
+        })
+    }
+    
+    #setRegistrationInfo(status) {
+        this.#registrationInfo = status
+    }
+    
+    #setLoginStatus(status) {
+        this.#loginStatus = status
+    }
+
     // platform
 
     initialize() {
@@ -98,39 +120,13 @@ class VkPlayPlatformBridge extends PlatformBridgeBase {
         return promiseDecorator.promise
     }
 
-    #setPlayer(player) {
-        this.#vkPlayPlayer = new Promise(player)
-    }
-    
-    #setRegistrationInfo(status) {
-        this.#registrationInfo = new Promise(status)
-    }
-    
-    #setLoginStatus(status) {
-        this.#loginStatus = new Promise(status)
-    }
-
     #getPlayer() {
-        if (!this.#vkPlayPlayer) {
+        let promiseDecorator = this._getPromiseDecorator(ACTION_NAME.GET_PROFILE)
+        if (!promiseDecorator) {
+            promiseDecorator = this._createPromiseDecorator(ACTION_NAME.GET_PROFILE)
             this._platformSdk.userProfile()
-            return this.#getPlayer()
         }
-        
-        if (!this._isPlayerAuthorized) {
-            return Promise.reject('not auth')
-        }
-        
-        return this.#vkPlayPlayer
-            .then((player) => {
-                if (player.status === 'error') {
-                    return Promise.reject(player.errmsg)
-                }
-                this._playerId = player.uid
-                this._playerName = player.nick
-
-                this._playerPhotos = []
-                this._playerPhotos.push(player.avatar)
-            })
+        return promiseDecorator
     }
     
     #getLoginStatus() {

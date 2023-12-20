@@ -90,6 +90,7 @@ export const ACTION_NAME = {
     GET_LEADERBOARD_ENTRIES: 'get_leaderboard_entries',
     GET_PURCHASES: 'get_purchases',
     GET_CATALOG: 'get_catalog',
+    GET_PROFILE: 'get_profile',
     PURCHASE: 'purchase',
     CONSUME_PURCHASE: 'consume_purchase',
     SHOW_LEADERBOARD_NATIVE_POPUP: 'show_leaderboard_native_popup',
